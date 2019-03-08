@@ -18,9 +18,9 @@ function catchErrors(fn) {
 /* todo útfæra vefþjónustuskil */
 
 async function listRoute(req, res) {
-  const items = await list();
-
-  return res.json(items);
+  const { order, completed } = req.query;
+  const result = await list(order, completed);
+  res.status(200).json(result);
 }
 
 async function findID(req, res) {

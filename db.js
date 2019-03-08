@@ -20,7 +20,7 @@ async function query(sqlQuery, values = []) {
   try {
     result = await client.query(sqlQuery, values);
   } catch (err) {
-    console.log('Error executing query', err);
+    console.log('Error executing query', err); // eslint-disable-line
     throw err;
   } finally {
     await client.end();

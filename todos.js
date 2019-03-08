@@ -2,9 +2,25 @@ const xss = require('xss');
 const validator = require('validator');
 const { query } = require('./db');
 
-async function list() {
-  const result = await query('SELECT * FROM verkefni');
+async function list(order = 'ASC', completed) {
+  const queryString = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
+  if (completed === 'true' || completed === 'false') {
+    const q = `
+    SELECT * 
+    FROM verkefni 
+    WHERE completed = $1
+    ORDER BY position ${queryString}`;
+    const result = await query(q, [completed]);
+    return result.rows;
+  }
+
+  const q = `
+    SELECT *
+    FROM verkefni
+    ORDER BY position ${queryString}`;
+
+  const result = await query(q, []);
   return result.rows;
 }
 
@@ -188,11 +204,9 @@ async function updateByID(id, item) {
 }
 
 /**
- * Updates an item, either its title, duedate,
- * position, completion or all of the above.
+ * Deletes an item.
  *
- * @param {number} id Id of item to update
- * @param {object} item Item to update
+ * @param {number} id Id of item to delete
  * @returns {object}
  */
 async function deleteByID(id) {
