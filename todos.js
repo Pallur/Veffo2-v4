@@ -13,7 +13,6 @@ const { query } = require('./db');
 async function list(order = 'ASC', completed) {
   const queryString = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
-
   if (completed === 'true' || completed === 'false') {
     const q = `
     SELECT * 
