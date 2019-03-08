@@ -21,7 +21,16 @@ function catchErrors(fn) {
 async function listRoute(req, res) {
   const { order, completed } = req.query;
   const result = await list(order, completed);
-  res.status(200).json(result);
+
+  if (!result.success && result.notFound) {
+    return res.status(404).json({ error: 'Page not found' });
+  }
+
+  if (!result.success && result.length === 0) {
+    return res.status(400).json({ error: 'List not available' });
+  }
+
+  return res.status(200).json(result);
 }
 
 async function findID(req, res) {
