@@ -86,7 +86,6 @@ function validate(title, due, position, completed) {
     });
   }
 
-
   return errors;
 }
 
