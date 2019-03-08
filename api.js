@@ -1,6 +1,7 @@
 const express = require('express');
 
 /* todo importa frá todos.js */
+
 const {
   list,
   findByID,
@@ -25,7 +26,7 @@ async function listRoute(req, res) {
 
 async function findID(req, res) {
   const { id } = req.params;
-  const result = await findByID(parseInt(id, 10));
+  const result = await findByID(id);
 
   if (!result.success && result.notFound) {
     return res.status(404).json({ error: 'Id not found' });
@@ -52,7 +53,7 @@ async function updateID(req, res) {
   const { id } = req.params;
   const { title, position, due, completed } = req.body;
 
-  const result = await updateByID(parseInt(id, 10),
+  const result = await updateByID(id,
     { title, position, due, completed });
 
   if (!result.success && result.notFound) {
@@ -64,7 +65,7 @@ async function updateID(req, res) {
 
 async function deleteID(req, res) {
   const { id } = req.params;
-  const result = await deleteByID(parseInt(id, 10));
+  const result = await deleteByID(id);
 
   if (!result.success && result.notFound) {
     return res.status(404).json({ error: 'Id not found' });
@@ -82,8 +83,5 @@ router.get('/:id', catchErrors(findID));
 router.post('/', catchErrors(postNew));
 router.patch('/:id', catchErrors(updateID));
 router.delete('/:id', catchErrors(deleteID));
-
-
-// router.get('/', catchErrors(descPosition));
 
 module.exports = router;

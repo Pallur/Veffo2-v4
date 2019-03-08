@@ -2,8 +2,17 @@ const xss = require('xss');
 const validator = require('validator');
 const { query } = require('./db');
 
+/**
+ * Shows the list, in ascending / descending order and/or
+ * if it's completed or not.
+ *
+ * @param {String} order Order of the list
+ * @param {boolean} completed Completed or not
+ * @returns {object}
+ */
 async function list(order = 'ASC', completed) {
   const queryString = order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+
 
   if (completed === 'true' || completed === 'false') {
     const q = `
@@ -20,7 +29,7 @@ async function list(order = 'ASC', completed) {
     FROM verkefni
     ORDER BY position ${queryString}`;
 
-  const result = await query(q, []);
+  const result = await query(q, completed);
   return result.rows;
 }
 
@@ -31,13 +40,6 @@ async function list(order = 'ASC', completed) {
  * @returns {object}
  */
 async function findByID(id) {
-  if (typeof id !== 'number') {
-    return {
-      success: false,
-      notFound: true,
-      validation: [],
-    };
-  }
   const q = 'SELECT * FROM verkefni WHERE id = $1';
   const result = await query(q, [id]);
   return result.rows;
@@ -68,8 +70,9 @@ function validate(title, due, position, completed) {
     }
   }
 
+  const pos = parseInt(position, 10);
   if (!isEmpty(position)) {
-    if (typeof position === 'object' || position.length < 0) {
+    if (typeof pos === 'object' || pos < 0 || isNaN(pos)) { // eslint-disable-line
       errors.push({
         field: 'position',
         error: 'Staðsetning verður að vera heiltala stærri eða jöfn 0',
@@ -135,9 +138,7 @@ async function insert(title, position, completed = false, due) {
 async function updateByID(id, item) {
   const result = await query('SELECT * FROM verkefni where id = $1', [id]);
 
-  const data = result.rows.find(i => i.id === parseInt(id, 10));
-
-  if (!data) {
+  if (!result) {
     return { error: 'Item not found' };
   }
 
